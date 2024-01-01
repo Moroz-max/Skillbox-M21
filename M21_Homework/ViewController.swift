@@ -6,30 +6,27 @@
 //
 
 import UIKit
+import SnapKit
 
 class ViewController: UIViewController {
 
-    var fishes = [Fish]()
-    let valueFish = 5
-    var valueFishCatched = 0
+    private var fishes = [Fish]()
+    private let valueFish = 5
+    private var valueFishCatched = 0
     
-    lazy var labelFish: UILabel = {
+    private lazy var labelFish: UILabel = {
        let label = UILabel()
-        label.text = " Поймано рыб: \(valueFishCatched)"
-        label.textColor = .green
-        label.backgroundColor = .white
-        label.layer.cornerRadius = 8
-        label.layer.masksToBounds = true
+        label.text = "Поймано рыб: \(valueFishCatched)"
+        label.textColor = .black
         return label
     }()
     
-    lazy var buttonReset : UIButton = {
+    private lazy var buttonReset : UIButton = {
         let button = UIButton()
-        button.frame = CGRect(x: 40, y: 780, width: 50, height: 20)
-        button.backgroundColor = .white
+        button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
-        button.setTitle("reset", for: .normal)
-        button.setTitleColor(UIColor.red, for: .normal)
+        button.setTitle("Сброс", for: .normal)
+        button.tintColor = .white
         button.addTarget(self, action: #selector(resetGame), for: .touchUpInside)
         return button
     }()
@@ -37,6 +34,28 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupViews()
+        setupConstaints()
+        setFish()
+       
+    }
+    
+    private func setupConstaints() {
+        labelFish.snp.makeConstraints { make in
+            make.right.equalTo(view.snp.rightMargin).offset(-20)
+            make.bottom.equalTo(view.snp.bottomMargin).offset(-20)
+            make.left.equalTo(view.snp.centerX)
+            make.height.equalTo(40)
+        }
+        buttonReset.snp.makeConstraints { make in
+            make.left.equalTo(view.snp.leftMargin).offset(20)
+            make.bottom.equalTo(view.snp.bottomMargin).offset(-20)
+            make.right.equalTo(view.snp.centerX)
+            make.height.equalTo(40)
+        }
+    }
+    
+    private func setupViews() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTap))
         view.addGestureRecognizer(tap)
         
@@ -45,12 +64,10 @@ class ViewController: UIViewController {
         
         view.addSubview(labelFish)
         view.addSubview(buttonReset)
-        
-        setFish()
-       
     }
     
-    func setFish () {
+    
+    private func setFish () {
         for _ in 0 ..< valueFish {
             let newFish:Fish = Fish(fish: UIImageView(image: UIImage(named: "fish")!), isFishCathed: false)
             newFish.fish.frame = CGRect( x: Int.random(in: 45 ... 300), y: Int.random(in: 70 ... 700), width: 100, height: 100)
@@ -68,73 +85,68 @@ class ViewController: UIViewController {
     }
     
     
-    func moveLeft(fish: Fish) {
+    private func moveLeft(fish: Fish) {
         if fish.isFishCathed { return }
-      
-      UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
-        let randomX = Int.random(in: 0..<Int(self.view.frame.width))
-        let randomY = Int.random(in: 0..<Int(self.view.frame.height))
-        fish.fish.center = CGPoint(x: randomX, y: randomY)
-      }, completion: { finished in
-        print("fish moved left!")
-        self.moveRight(fish: fish)
-      })
-    }
-    
-    
-    func moveRight(fish: Fish) {
-        if fish.isFishCathed { return }
-        UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction],animations: {
+          UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
             let randomX = Int.random(in: 0..<Int(self.view.frame.width))
             let randomY = Int.random(in: 0..<Int(self.view.frame.height))
             fish.fish.center = CGPoint(x: randomX, y: randomY)
-        }, completion: { finished in
-            print("fish moved right!")
-            self.moveTop(fish: fish)
-        })
+          }, completion: { finished in
+            self.moveRight(fish: fish)
+          })
     }
     
-    func moveTop(fish: Fish) {
+    
+    private func moveRight(fish: Fish) {
         if fish.isFishCathed { return }
-        UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
-            let randomX = Int.random(in: 0..<Int(self.view.frame.width))
-            let randomY = Int.random(in: 0..<Int(self.view.frame.height))
-            fish.fish.center = CGPoint(x: randomX, y: randomY)
-        }, completion: { finished in
-            print("fish moved top!")
-            self.moveBottom(fish: fish)
-        })
+            UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction],animations: {
+                let randomX = Int.random(in: 0..<Int(self.view.frame.width))
+                let randomY = Int.random(in: 0..<Int(self.view.frame.height))
+                fish.fish.center = CGPoint(x: randomX, y: randomY)
+            }, completion: { finished in
+                self.moveTop(fish: fish)
+            })
     }
     
-    func moveBottom(fish: Fish) {
+    private func moveTop(fish: Fish) {
         if fish.isFishCathed { return }
-        UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
-            let randomX = Int.random(in: 0..<Int(self.view.frame.width))
-            let randomY = Int.random(in: 0..<Int(self.view.frame.height))
-            fish.fish.center = CGPoint(x: randomX, y: randomY)
-        }, completion: { finished in
-            print("fish moved bottom!")
-            self.moveLeft(fish: fish)
-        })
+            UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
+                let randomX = Int.random(in: 0..<Int(self.view.frame.width))
+                let randomY = Int.random(in: 0..<Int(self.view.frame.height))
+                fish.fish.center = CGPoint(x: randomX, y: randomY)
+            }, completion: { finished in
+                self.moveBottom(fish: fish)
+            })
+    }
+    
+    private func moveBottom(fish: Fish) {
+        if fish.isFishCathed { return }
+            UIView.animate(withDuration: 1.0, delay: 2.0, options: [.curveEaseInOut , .allowUserInteraction], animations: {
+                let randomX = Int.random(in: 0..<Int(self.view.frame.width))
+                let randomY = Int.random(in: 0..<Int(self.view.frame.height))
+                fish.fish.center = CGPoint(x: randomX, y: randomY)
+            }, completion: { finished in
+                self.moveLeft(fish: fish)
+            })
     }
     
     
     
-    @objc func resetGame () {
+    @objc private func resetGame () {
         if valueFishCatched == 5 {
             setFish()
             valueFishCatched = 0
+            labelFish.text = "Поймано рыб: \(valueFishCatched)"
             print("Все рыбы пойманы!")
         } else {
-            print("Продалжаем играть!")
+            print("Не все рыбы пойманы!")
         }
     }
     
-    @objc func didTap(_ gesture: UITapGestureRecognizer) {
+    @objc private func didTap(_ gesture: UITapGestureRecognizer) {
         for fish in 0..<fishes.count {
             let tapLocation = gesture.location(in: fishes[fish].fish.superview)
             if (fishes[fish].fish.layer.presentation()?.frame.contains(tapLocation))! {
-                print("fish tapped!")
                 if fishes[fish].isFishCathed { return }
                 fishes[fish].isFishCathed = true
                 fishCatchedAnimation(fishes[fish].fish)
@@ -142,7 +154,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func fishCatchedAnimation(_ fish: UIImageView) {
+    private func fishCatchedAnimation(_ fish: UIImageView) {
         fish.removeFromSuperview()
         self.valueFishCatched += 1
         print("Пойманно рыб: \(self.valueFishCatched)")
